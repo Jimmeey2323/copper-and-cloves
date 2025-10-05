@@ -169,5 +169,30 @@ export const memberAPI = {
 
     const data = await response.json();
     return redactData(data);
-  }
+  },
+
+  async createNewMember(memberDetails: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber?: string;
+  }): Promise<{ memberId: number }> {
+    const response = await momenceAPI.request('https://api.momence.com/api/v2/host/members', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...memberDetails,
+        homeLocationId: 36372, // As specified in the request
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to create new member: ${errorText}`);
+    }
+
+    return response.json();
+  },
 };

@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from '@/components/loading-spinner';
 import { AnimatedBadge } from '@/components/animated-badge';
+import { NewMemberForm } from '@/components/new-member-form';
 import { Search, UserPlus, Phone, Mail, EyeOff, User } from 'lucide-react';
 
 interface MemberSearchProps {
@@ -21,6 +22,7 @@ export function MemberSearch({ sessionId, onMemberAdded }: MemberSearchProps) {
   const [loading, setLoading] = useState(false);
   // const [adding, setAdding] = useState<number | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [showNewMemberForm, setShowNewMemberForm] = useState(false);
   const [isDataUnlocked] = useState(() => DataEncryption.isDataUnlocked());
 
   const handleSearch = async () => {
@@ -142,6 +144,17 @@ export function MemberSearch({ sessionId, onMemberAdded }: MemberSearchProps) {
               <div className="text-center py-8 text-gray-500">
                 <User className="w-8 h-8 mx-auto mb-2 opacity-50" />
                 <p>No members found with that email address.</p>
+                <Button 
+                  variant="link" 
+                  className="mt-2 text-blue-600 hover:underline"
+                  onClick={() => {
+                    setShowNewMemberForm(true);
+                    setShowResults(false);
+                  }}
+                >
+                  <UserPlus className="w-4 h-4 mr-1" />
+                  Create a new member
+                </Button>
               </div>
             ) : (
               searchResults.map((member) => (
@@ -215,6 +228,18 @@ export function MemberSearch({ sessionId, onMemberAdded }: MemberSearchProps) {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* New Member Form */}
+      {showNewMemberForm && (
+        <NewMemberForm 
+          sessionId={sessionId}
+          onMemberAdded={() => {
+            setShowNewMemberForm(false);
+            onMemberAdded?.();
+          }}
+          onCancel={() => setShowNewMemberForm(false)}
+        />
       )}
     </div>
   );
