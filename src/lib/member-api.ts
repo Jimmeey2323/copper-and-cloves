@@ -52,15 +52,21 @@ const redactData = (data: any): any => {
     return data.map(redactData);
   }
   
-  if (data && typeof data === 'object') {
+  if (data && typeof data === 'object' && data !== null) {
     const redacted = { ...data };
     
-    if (redacted.email) {
-      redacted.email = '***@***.***';
+    if (redacted.email && typeof redacted.email === 'string') {
+      const [localPart, domain] = redacted.email.split('@');
+      if (localPart && domain) {
+        const redactedLocal = localPart.substring(0, 2) + '****';
+        redacted.email = `${redactedLocal}@${domain}`;
+      } else {
+        redacted.email = '****@****';
+      }
     }
     
-    if (redacted.phoneNumber) {
-      redacted.phoneNumber = '***-***-****';
+    if (redacted.phoneNumber && typeof redacted.phoneNumber === 'string') {
+      redacted.phoneNumber = '**********' + redacted.phoneNumber.slice(-2);
     }
     
     Object.keys(redacted).forEach(key => {
