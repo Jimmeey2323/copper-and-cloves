@@ -77,7 +77,7 @@ export function SessionDetailDialog({
               <DialogTitle className="text-2xl font-bold">{session.name}</DialogTitle>
               <DialogDescription>
                 {session.description ? (
-                  <p className="mt-2 text-base text-gray-600">{session.description}</p>
+                  <p className="mt-2 text-base text-gray-600 whitespace-pre-wrap">{session.description}</p>
                 ) : (
                   <p className="mt-2 text-base text-gray-600">Class details and member management</p>
                 )}
