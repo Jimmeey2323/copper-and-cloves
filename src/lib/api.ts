@@ -170,6 +170,18 @@ class MomenceAPI {
     password: 'Jimmeey@123'
   };
 
+  // Helper function for Momence cookie-based headers (used for credit operations)
+  private getMomenceHeaders() {
+    return {
+      'Cookie': import.meta.env.VITE_MOMENCE_ALL_COOKIES,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (compatible; LeadsScript/1.0)',
+      'Connection': 'keep-alive',
+      'Cache-Control': 'no-cache'
+    };
+  }
+
   async authenticate(): Promise<AuthResponse> {
     try {
       const response = await fetch(`${this.baseURL}/auth/token`, {
@@ -341,7 +353,7 @@ class MomenceAPI {
       }
     } catch (error) {
       console.error('Error parsing JSON response:', error);
-      throw new Error(`Failed to parse sessions response: ${error.message}`);
+      throw new Error(`Failed to parse sessions response: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -361,7 +373,7 @@ class MomenceAPI {
       }
     } catch (error) {
       console.error('Error parsing JSON response:', error);
-      throw new Error(`Failed to parse session detail response: ${error.message}`);
+      throw new Error(`Failed to parse session detail response: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -389,7 +401,7 @@ class MomenceAPI {
       }
     } catch (error) {
       console.error('Error parsing JSON response:', error);
-      throw new Error(`Failed to parse session bookings response: ${error.message}`);
+      throw new Error(`Failed to parse session bookings response: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -472,7 +484,7 @@ class MomenceAPI {
       }
     } catch (error) {
       console.error('Error parsing JSON response:', error);
-      throw new Error(`Failed to create member: ${error.message}`);
+      throw new Error(`Failed to create member: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -514,7 +526,7 @@ class MomenceAPI {
       }
     } catch (error) {
       console.error('Error parsing JSON response:', error);
-      throw new Error(`Failed to fetch member sessions: ${error.message}`);
+      throw new Error(`Failed to fetch member sessions: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -558,12 +570,7 @@ class MomenceAPI {
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Cookie': import.meta.env.VITE_MOMENCE_ALL_COOKIES,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (compatible; LeadsScript/1.0)',
-      },
+      headers: this.getMomenceHeaders(),
       body: JSON.stringify(payload)
     });
 
