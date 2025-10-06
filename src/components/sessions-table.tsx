@@ -185,28 +185,47 @@ export function SessionsTable({ sessions, onSessionClick }: SessionsTableProps) 
 
       {/* Sessions List */}
       <div className="space-y-4">
-        {paginatedSessions.map((session) => (
+        {paginatedSessions.map((session) => {
+          const now = new Date();
+          const startTime = parseISO(session.startsAt);
+          const endTime = parseISO(session.endsAt);
+          const isInProgress = !session.isCancelled && now >= startTime && now <= endTime;
+          
+          return (
           <Card 
             key={session.id} 
-            className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:border-blue-400/50 bg-gradient-to-r from-white via-blue-50/20 to-purple-50/20 border border-gray-200/50"
+            className={`cursor-pointer transition-all duration-300 border ${
+              isInProgress 
+                ? 'bg-gradient-to-r from-green-50 via-emerald-50 to-green-50 border-green-300 shadow-lg shadow-green-200/50 hover:shadow-xl hover:shadow-green-300/50 animate-pulse' 
+                : 'hover:shadow-lg hover:border-blue-400/50 bg-gradient-to-r from-white via-blue-50/20 to-purple-50/20 border-gray-200/50'
+            }`}
             onClick={() => onSessionClick(session.id)}
           >
             <CardContent className="p-4 md:p-6">
               {/* Mobile Layout */}
               <div className="md:hidden space-y-3">
                 <div className="flex justify-between items-start">
-                  <div>
+                  <div className="flex-1">
+                    {isInProgress && (
+                      <div className="mb-2">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-red-500 text-white animate-pulse shadow-lg">
+                          🔴 LIVE NOW
+                        </span>
+                      </div>
+                    )}
                     <h3 className="font-semibold text-lg">{session.name}</h3>
                     <p className="text-sm text-muted-foreground">
                       {format(parseISO(session.startsAt), 'MMM dd, yyyy • h:mm a')}
                     </p>
                   </div>
-                  <Badge 
-                    variant={session.type === 'fitness' ? 'default' : 'secondary'}
-                    className="ml-2"
-                  >
-                    {session.type}
-                  </Badge>
+                  <div className="flex flex-col items-end space-y-1">
+                    <Badge 
+                      variant={session.type === 'fitness' ? 'default' : 'secondary'}
+                      className="ml-2"
+                    >
+                      {session.type}
+                    </Badge>
+                  </div>
                 </div>
                 
                 <div className="flex items-center justify-between">
@@ -261,7 +280,14 @@ export function SessionsTable({ sessions, onSessionClick }: SessionsTableProps) 
                 
                 <div className="col-span-4">
                   <div className="space-y-2">
-                    <h3 className="font-bold text-gray-900 text-lg leading-tight">{session.name}</h3>
+                    <div className="flex items-center space-x-3">
+                      <h3 className="font-bold text-gray-900 text-lg leading-tight">{session.name}</h3>
+                      {isInProgress && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-500 text-white animate-pulse shadow-lg">
+                          🔴 LIVE NOW
+                        </span>
+                      )}
+                    </div>
                     {session.description && (
                       <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">{session.description}</p>
                     )}
@@ -346,7 +372,8 @@ export function SessionsTable({ sessions, onSessionClick }: SessionsTableProps) 
               </div>
             </CardContent>
           </Card>
-        ))}
+          );
+        })}
       </div>
 
       {totalItems === 0 && (

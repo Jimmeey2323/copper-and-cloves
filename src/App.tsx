@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { parseISO, isAfter, isBefore } from 'date-fns';
+import { parseISO, isAfter, isBefore, format } from 'date-fns';
 import { momenceAPI, type Session, type SessionDetail, type Booking } from '@/lib/api';
 import { SessionsTable } from '@/components/sessions-table';
 import { CalendarView } from '@/components/calendar-view';
@@ -10,7 +10,6 @@ import { SessionDetailDialog } from '@/components/session-detail-dialog';
 import { ReportsPanel } from '@/components/reports-panel';
 import { Header } from '@/components/header';
 import { LoadingSpinner } from '@/components/loading-spinner';
-import { Physique57Logo } from '@/components/physique57-logo';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { List, Calendar, Grid3X3, LayoutGrid, BarChart3 } from 'lucide-react';
@@ -37,6 +36,22 @@ function App() {
   const filteredSessions = useMemo(() => {
     let filtered = [...sessions];
     const now = new Date();
+
+    // Debug: Check for in-progress sessions
+    const inProgressSessions = sessions.filter(session => {
+      const startTime = parseISO(session.startsAt);
+      const endTime = parseISO(session.endsAt);
+      return !session.isCancelled && now >= startTime && now <= endTime;
+    });
+    
+    if (inProgressSessions.length > 0) {
+      console.log(`Found ${inProgressSessions.length} in-progress sessions:`, inProgressSessions.map(s => ({
+        name: s.name,
+        startTime: s.startsAt,
+        endTime: s.endsAt,
+        currentTime: now.toISOString()
+      })));
+    }
 
     // First apply tab filter (upcoming vs past)
     if (currentTab === 'upcoming') {
@@ -241,17 +256,40 @@ function App() {
       <main className="container mx-auto px-6 py-12">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-4">
-              {/* Animated Logo for Page Title */}
-              <Physique57Logo size="md" animated={true} />
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                  Class Schedule
-                </h1>
-                <p className="text-lg text-muted-foreground">
-                  Manage your fitness classes • {filteredSessions.length} classes found
-                </p>
-              </div>
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                Class Schedule
+              </h1>
+              <p className="text-lg text-muted-foreground">
+                Manage your fitness classes • {filteredSessions.length} classes found
+                {(() => {
+                  const now = new Date();
+                  const inProgressCount = sessions.filter(s => {
+                    const startTime = parseISO(s.startsAt);
+                    const endTime = parseISO(s.endsAt);
+                    return !s.isCancelled && now >= startTime && now <= endTime;
+                  }).length;
+                  const upcomingCount = sessions.filter(s => {
+                    const startTime = parseISO(s.startsAt);
+                    return !s.isCancelled && now < startTime;
+                  }).length;
+                  const pastCount = sessions.filter(s => {
+                    const endTime = parseISO(s.endsAt);
+                    return now > endTime || s.isCancelled;
+                  }).length;
+                  
+                  return inProgressCount > 0 ? (
+                    <div className="mt-2 text-sm">
+                      <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full font-medium">
+                        🔴 {inProgressCount} Live Now
+                      </span>
+                      <span className="ml-2 text-gray-600">
+                        • {upcomingCount} Upcoming • {pastCount} Past
+                      </span>
+                    </div>
+                  ) : null;
+                })()}
+              </p>
             </div>
             
             {/* View Switcher */}
@@ -336,7 +374,16 @@ function App() {
                     : 'hover:bg-green-50 text-gray-700'
                   }
                 >
-                  Upcoming & Live ({sessions.filter(s => !s.isCancelled && new Date() <= parseISO(s.endsAt)).length})
+                  Upcoming & Live ({(() => {
+                    const now = new Date();
+                    const upcomingCount = sessions.filter(s => !s.isCancelled && now <= parseISO(s.endsAt)).length;
+                    const liveCount = sessions.filter(s => {
+                      const startTime = parseISO(s.startsAt);
+                      const endTime = parseISO(s.endsAt);
+                      return !s.isCancelled && now >= startTime && now <= endTime;
+                    }).length;
+                    return liveCount > 0 ? `${upcomingCount} • ${liveCount} LIVE` : upcomingCount;
+                  })()})
                 </Button>
                 <Button
                   variant={currentTab === 'past' ? 'default' : 'ghost'}
@@ -349,6 +396,32 @@ function App() {
                 >
                   Past Classes ({sessions.filter(s => new Date() > parseISO(s.endsAt) || s.isCancelled).length})
                 </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Debug Panel (Development Only) */}
+          {process.env.NODE_ENV === 'development' && sessions.length > 0 && (
+            <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <h3 className="font-semibold text-yellow-800 mb-2">🔧 Session Status Debug</h3>
+              <div className="text-sm text-yellow-700">
+                Current Time: {new Date().toLocaleString()}<br/>
+                {sessions.slice(0, 3).map((session, index) => {
+                  const now = new Date();
+                  const startTime = parseISO(session.startsAt);
+                  const endTime = parseISO(session.endsAt);
+                  const isInProgress = !session.isCancelled && now >= startTime && now <= endTime;
+                  const isUpcoming = !session.isCancelled && now < startTime;
+                  
+                  return (
+                    <div key={index} className="mt-1 p-2 bg-white rounded border">
+                      <strong>{session.name}</strong><br/>
+                      Start: {format(startTime, 'MMM dd, yyyy h:mm a')}<br/>
+                      End: {format(endTime, 'MMM dd, yyyy h:mm a')}<br/>
+                      Status: {isInProgress ? '🟢 IN PROGRESS' : isUpcoming ? '🔵 UPCOMING' : '🔴 PAST/CANCELLED'}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
