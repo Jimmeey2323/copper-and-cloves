@@ -39,14 +39,20 @@ function App() {
 
     // First apply tab filter (upcoming vs past)
     if (currentTab === 'upcoming') {
-      filtered = filtered.filter(session =>
-        !session.isCancelled && !isBefore(parseISO(session.endsAt), now)
-      );
+      filtered = filtered.filter(session => {
+        const endTime = parseISO(session.endsAt);
+        // Include sessions that haven't ended yet (both upcoming and in-progress)
+        return !session.isCancelled && now <= endTime;
+      });
     } else if (currentTab === 'past') {
-      filtered = filtered.filter(session =>
-        isBefore(parseISO(session.endsAt), now) || session.isCancelled
-      );
-    }    // Apply search filter
+      filtered = filtered.filter(session => {
+        const endTime = parseISO(session.endsAt);
+        // Include sessions that have ended or are cancelled
+        return now > endTime || session.isCancelled;
+      });
+    }
+    
+    // Apply search filter
     if (filters.searchTerm) {
       const searchTerm = filters.searchTerm.toLowerCase();
       filtered = filtered.filter(session => 
@@ -325,7 +331,7 @@ function App() {
                     : 'hover:bg-green-50 text-gray-700'
                   }
                 >
-                  Upcoming Classes ({sessions.filter(s => !s.isCancelled && !isBefore(parseISO(s.endsAt), new Date())).length})
+                  Upcoming & Live ({sessions.filter(s => !s.isCancelled && new Date() <= parseISO(s.endsAt)).length})
                 </Button>
                 <Button
                   variant={currentTab === 'past' ? 'default' : 'ghost'}
@@ -336,7 +342,7 @@ function App() {
                     : 'hover:bg-gray-50 text-gray-700'
                   }
                 >
-                  Past Classes ({sessions.filter(s => isBefore(parseISO(s.endsAt), new Date()) || s.isCancelled).length})
+                  Past Classes ({sessions.filter(s => new Date() > parseISO(s.endsAt) || s.isCancelled).length})
                 </Button>
               </div>
             </div>

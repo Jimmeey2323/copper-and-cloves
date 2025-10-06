@@ -76,8 +76,18 @@ export function SessionsTable({ sessions, onSessionClick }: SessionsTableProps) 
 
 
   const getStatusText = (session: Session) => {
+    const now = new Date();
+    const startTime = parseISO(session.startsAt);
+    const endTime = parseISO(session.endsAt);
+    
     if (session.isCancelled) return 'Cancelled';
     if (session.isDraft) return 'Draft';
+    
+    // Check if session is currently in progress
+    if (now >= startTime && now <= endTime) {
+      return 'Live Now';
+    }
+    
     if (session.bookingCount >= session.capacity) return 'Full';
     if (session.bookingCount === 0) return 'Available';
     return `${session.capacity - session.bookingCount} spots left`;
@@ -216,7 +226,17 @@ export function SessionsTable({ sessions, onSessionClick }: SessionsTableProps) 
                     <div className="text-sm font-medium">
                       {session.bookingCount}/{session.capacity}
                     </div>
-                    <AnimatedBadge status={session.isCancelled ? 'cancelled' : session.bookingCount >= session.capacity ? 'full' : session.bookingCount === 0 ? 'available' : 'upcoming'}>
+                    <AnimatedBadge status={(() => {
+                      const now = new Date();
+                      const startTime = parseISO(session.startsAt);
+                      const endTime = parseISO(session.endsAt);
+                      
+                      if (session.isCancelled) return 'cancelled';
+                      if (now >= startTime && now <= endTime) return 'in-progress';
+                      if (session.bookingCount >= session.capacity) return 'full';
+                      if (session.bookingCount === 0) return 'available';
+                      return 'upcoming';
+                    })()}>
                       {getStatusText(session)}
                     </AnimatedBadge>
                   </div>
@@ -303,7 +323,17 @@ export function SessionsTable({ sessions, onSessionClick }: SessionsTableProps) 
                 
                 <div className="col-span-1 flex justify-center">
                   <div className="text-center space-y-1">
-                    <AnimatedBadge status={session.isCancelled ? 'cancelled' : session.bookingCount >= session.capacity ? 'full' : session.bookingCount === 0 ? 'available' : 'upcoming'}>
+                    <AnimatedBadge status={(() => {
+                      const now = new Date();
+                      const startTime = parseISO(session.startsAt);
+                      const endTime = parseISO(session.endsAt);
+                      
+                      if (session.isCancelled) return 'cancelled';
+                      if (now >= startTime && now <= endTime) return 'in-progress';
+                      if (session.bookingCount >= session.capacity) return 'full';
+                      if (session.bookingCount === 0) return 'available';
+                      return 'upcoming';
+                    })()}>
                       {getStatusText(session)}
                     </AnimatedBadge>
                     {session.inPersonLocation && (
