@@ -77,7 +77,7 @@ export function SessionDetailDialog({
               <DialogTitle className="text-2xl font-bold">{session.name}</DialogTitle>
               <DialogDescription>
                 {session.description ? (
-                  <p className="mt-2 text-base text-gray-600 whitespace-pre-wrap">{session.description}</p>
+                  <p className="mt-2 text-base text-gray-600 whitespace-pre-wrap max-h-[300px] overflow-y-auto">{session.description}</p>
                 ) : (
                   <p className="mt-2 text-base text-gray-600">Class details and member management</p>
                 )}
@@ -372,12 +372,6 @@ export function SessionDetailDialog({
                                   <Mail className="w-3 h-3" />
                                   <span>{DataEncryption.getSecureData(booking.member.email)}</span>
                                 </div>
-                                {booking.member.phoneNumber && (
-                                  <div className="flex items-center space-x-1 text-muted-foreground">
-                                    <Phone className="w-3 h-3" />
-                                    <span>{isDataUnlocked ? booking.member.phoneNumber : DataEncryption.maskPhone(booking.member.phoneNumber)}</span>
-                                  </div>
-                                )}
                                 <div>
                                   <span className="text-muted-foreground">Booking ID: </span>
                                   <span>{booking.id}</span>

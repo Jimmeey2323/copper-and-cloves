@@ -108,15 +108,7 @@ export function NewMemberForm({ sessionId, onMemberAdded, onCancel }: NewMemberF
               required
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="phoneNumber">Phone Number (Optional)</Label>
-            <Input
-              id="phoneNumber"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="Enter phone number"
-            />
-          </div>
+
         </CardContent>
         <CardFooter className="flex justify-end space-x-2">
           <Button type="button" variant="ghost" onClick={onCancel}>

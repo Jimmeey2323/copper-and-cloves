@@ -174,18 +174,10 @@ export function MemberSearch({ sessionId, onMemberAdded }: MemberSearchProps) {
                           </h4>
                           <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
                             {isDataUnlocked ? (
-                              <>
-                                <div className="flex items-center space-x-1">
-                                  <Mail className="w-3 h-3" />
-                                  <span>{member.email}</span>
-                                </div>
-                                {member.phoneNumber && (
-                                  <div className="flex items-center space-x-1">
-                                    <Phone className="w-3 h-3" />
-                                    <span>{member.phoneNumber}</span>
-                                  </div>
-                                )}
-                              </>
+                              <div className="flex items-center space-x-1">
+                                <Mail className="w-3 h-3" />
+                                <span>{member.email}</span>
+                              </div>
                             ) : (
                               <div className="flex items-center space-x-2">
                                 <EyeOff className="w-3 h-3 text-red-500" />
