@@ -7,7 +7,7 @@ import {
 } from '@/lib/reports-api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+
 import {
   Select,
   SelectContent,
@@ -52,7 +52,6 @@ export function ReportsPanel() {
     try {
       let reportData;
       const startDate = dateRange?.from?.toISOString().split('T')[0];
-      const endDate = dateRange?.to?.toISOString().split('T')[0];
 
       switch (reportType) {
         case 'dailyVisitors':
