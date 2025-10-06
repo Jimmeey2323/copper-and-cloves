@@ -18,16 +18,15 @@ export function NewMemberForm({ sessionId, onMemberAdded, onCancel }: NewMemberF
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<'free' | 'credit' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (useCredit: boolean) => {
     if (!firstName || !lastName || !email) {
       setError('First Name, Last Name, and Email are required.');
       return;
     }
-    setLoading(true);
+    setLoading(useCredit ? 'credit' : 'free');
     setError(null);
 
     try {
@@ -39,7 +38,11 @@ export function NewMemberForm({ sessionId, onMemberAdded, onCancel }: NewMemberF
       });
 
       if (sessionId) {
-        await memberAPI.addMemberToClass(newMember.memberId, sessionId);
+        if (useCredit) {
+          await memberAPI.addMemberToClassWithCredit(newMember.memberId, sessionId);
+        } else {
+          await memberAPI.addMemberToClass(newMember.memberId, sessionId);
+        }
         alert(`Successfully created and added ${firstName} ${lastName} to the class!`);
         onMemberAdded?.();
       } else {
@@ -58,7 +61,7 @@ export function NewMemberForm({ sessionId, onMemberAdded, onCancel }: NewMemberF
       setError(errorMessage);
       alert(`Operation failed: ${errorMessage}`);
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   };
 
@@ -72,7 +75,7 @@ export function NewMemberForm({ sessionId, onMemberAdded, onCancel }: NewMemberF
           <span className="text-luxury-gradient font-semibold">Create New Member</span>
         </CardTitle>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={(e) => e.preventDefault()}>
         <CardContent className="space-y-4">
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -114,8 +117,11 @@ export function NewMemberForm({ sessionId, onMemberAdded, onCancel }: NewMemberF
           <Button type="button" variant="ghost" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit" disabled={loading} className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white">
-            {loading ? <LoadingSpinner size="sm" /> : 'Create & Add Member'}
+          <Button type="button" onClick={() => handleSubmit(false)} disabled={!!loading} className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white">
+            {loading === 'free' ? <LoadingSpinner size="sm" /> : 'Create & Add Free'}
+          </Button>
+          <Button type="button" onClick={() => handleSubmit(true)} disabled={!!loading} className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white">
+            {loading === 'credit' ? <LoadingSpinner size="sm" /> : 'Create & Use Credit'}
           </Button>
         </CardFooter>
       </form>
