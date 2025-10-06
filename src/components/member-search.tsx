@@ -47,7 +47,7 @@ export function MemberSearch({ sessionId, onMemberAdded }: MemberSearchProps) {
     }
   };
 
-  const handleAddToClass = async (member: Member) => {
+  const handleAddToClass = async (member: Member, useCredit: boolean = false) => {
     if (!sessionId) {
       alert('No session selected. Please select a session first.');
       return;
@@ -55,7 +55,11 @@ export function MemberSearch({ sessionId, onMemberAdded }: MemberSearchProps) {
 
     try {
       try {
-        await memberAPI.addMemberToClass(member.id, sessionId);
+        if (useCredit) {
+          await memberAPI.addMemberToClassWithCredit(member.id, sessionId);
+        } else {
+          await memberAPI.addMemberToClass(member.id, sessionId);
+        }
       } catch (apiError) {
         console.warn('API call failed, simulating success:', apiError);
         // Simulate successful addition for demo
@@ -66,7 +70,7 @@ export function MemberSearch({ sessionId, onMemberAdded }: MemberSearchProps) {
       setSearchTerm('');
       setSearchResults([]);
       onMemberAdded?.();
-      alert(`Successfully added ${member.firstName} ${member.lastName} to the class!`);
+      alert(`Successfully added ${member.firstName} ${member.lastName} to the class${useCredit ? ' using credit' : ' for free'}!`);
     } catch (error) {
       console.error('Failed to add member to class:', error);
       if (error instanceof Error) {
@@ -203,14 +207,23 @@ export function MemberSearch({ sessionId, onMemberAdded }: MemberSearchProps) {
                       </div>
                       
                       {sessionId && (
-                        <Button
-                          onClick={() => handleAddToClass(member)}
-                          size="sm"
-                          className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white border-0 shadow-lg"
-                        >
-                          <UserPlus className="w-3 h-3 mr-1" />
-                          Add to Class
-                        </Button>
+                        <div className="flex flex-col space-y-2">
+                          <Button
+                            onClick={() => handleAddToClass(member, false)}
+                            size="sm"
+                            className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white border-0 shadow-lg"
+                          >
+                            <UserPlus className="w-3 h-3 mr-1" />
+                            Add Free
+                          </Button>
+                          <Button
+                            onClick={() => handleAddToClass(member, true)}
+                            size="sm"
+                            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg"
+                          >
+                            Use Credit
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </CardContent>
