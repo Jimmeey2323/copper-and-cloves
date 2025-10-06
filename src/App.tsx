@@ -10,6 +10,7 @@ import { SessionDetailDialog } from '@/components/session-detail-dialog';
 import { ReportsPanel } from '@/components/reports-panel';
 import { Header } from '@/components/header';
 import { LoadingSpinner } from '@/components/loading-spinner';
+import { Physique57Logo } from '@/components/physique57-logo';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { List, Calendar, Grid3X3, LayoutGrid, BarChart3 } from 'lucide-react';
@@ -240,13 +241,17 @@ function App() {
       <main className="container mx-auto px-6 py-12">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                Class Schedule
-              </h1>
-              <p className="text-lg text-muted-foreground">
-                Manage your fitness classes • {filteredSessions.length} classes found
-              </p>
+            <div className="flex items-center space-x-4">
+              {/* Animated Logo for Page Title */}
+              <Physique57Logo size="md" animated={true} />
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                  Class Schedule
+                </h1>
+                <p className="text-lg text-muted-foreground">
+                  Manage your fitness classes • {filteredSessions.length} classes found
+                </p>
+              </div>
             </div>
             
             {/* View Switcher */}

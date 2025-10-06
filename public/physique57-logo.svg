@@ -1,0 +1,27 @@
+<svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5DADE2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3498DB;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Large stylized "5" -->
+  <path d="M60 40 L130 40 Q150 40 150 60 L150 85 Q150 105 130 105 L90 105 L90 125 Q90 135 100 135 L130 135 Q150 135 150 155 L150 180 Q150 200 130 200 L60 200 Q40 200 40 180 L40 155 Q40 135 60 135 L60 115 Q40 115 40 95 L40 60 Q40 40 60 40 Z" fill="url(#blueGradient)"/>
+  
+  <!-- Large stylized "7" -->
+  <path d="M170 90 L260 90 Q280 90 275 110 L220 200 L245 240 Q260 260 240 260 L170 300 Q150 300 155 280 L180 240 L200 200 L240 120 L170 120 Q150 120 150 100 Q150 90 170 90 Z" fill="url(#blueGradient)"/>
+  
+  <!-- PHYSIQUE text -->
+  <text x="20" y="250" font-family="Arial, sans-serif" font-size="28" font-weight="900" fill="#2C3E50" letter-spacing="1px">PHYSIQUE</text>
+  
+  <!-- Decorative flowing elements -->
+  <path d="M40 270 Q80 280 120 270 Q160 260 200 270 Q240 280 280 270" stroke="url(#blueGradient)" stroke-width="3" fill="none" opacity="0.7"/>
+  
+  <!-- Small accent circles -->
+  <circle cx="30" cy="290" r="6" fill="url(#blueGradient)" opacity="0.8"/>
+  <circle cx="270" cy="290" r="4" fill="url(#blueGradient)" opacity="0.6"/>
+  
+  <!-- Subtle background accent -->
+  <circle cx="150" cy="150" r="140" fill="none" stroke="url(#blueGradient)" stroke-width="1" opacity="0.2"/>
+</svg>
