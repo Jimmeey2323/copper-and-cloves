@@ -40,7 +40,7 @@ function App() {
     // First apply tab filter (upcoming vs past)
     if (currentTab === 'upcoming') {
       filtered = filtered.filter(session => 
-        !session.isCancelled && isAfter(parseISO(session.startsAt), now)
+        !session.isCancelled && !isBefore(parseISO(session.endsAt), now)
       );
     } else if (currentTab === 'past') {
       filtered = filtered.filter(session => 
@@ -327,7 +327,7 @@ function App() {
                     : 'hover:bg-green-50 text-gray-700'
                   }
                 >
-                  Upcoming Classes ({sessions.filter(s => !s.isCancelled && isAfter(parseISO(s.startsAt), new Date())).length})
+                  Upcoming Classes ({sessions.filter(s => !s.isCancelled && !isBefore(parseISO(s.endsAt), new Date())).length})
                 </Button>
                 <Button
                   variant={currentTab === 'past' ? 'default' : 'ghost'}
