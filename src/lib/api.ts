@@ -172,14 +172,34 @@ class MomenceAPI {
 
   // Helper function for Momence cookie-based headers (used for credit operations)
   private getMomenceHeaders() {
-    return {
-      'Cookie': import.meta.env.VITE_MOMENCE_ALL_COOKIES,
+    const cookieValue = import.meta.env.VITE_MOMENCE_ALL_COOKIES;
+    
+    // Debug logging
+    console.log('🍪 Debug: Cookie environment variable status:');
+    console.log('  - Variable name: VITE_MOMENCE_ALL_COOKIES');
+    console.log('  - Value exists:', !!cookieValue);
+    console.log('  - Value length:', cookieValue?.length || 0);
+    console.log('  - First 50 chars:', cookieValue?.substring(0, 50) || 'No value');
+    
+    if (!cookieValue) {
+      console.warn('⚠️ Warning: VITE_MOMENCE_ALL_COOKIES is not set in environment variables!');
+    }
+    
+    const headers = {
+      'Cookie': cookieValue,
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'User-Agent': 'Mozilla/5.0 (compatible; LeadsScript/1.0)',
       'Connection': 'keep-alive',
       'Cache-Control': 'no-cache'
     };
+    
+    console.log('🔍 Debug: Constructed headers:', {
+      ...headers,
+      Cookie: headers.Cookie ? `${headers.Cookie.substring(0, 50)}...` : 'NOT SET'
+    });
+    
+    return headers;
   }
 
   async authenticate(): Promise<AuthResponse> {
@@ -543,7 +563,13 @@ class MomenceAPI {
   }
 
   async addMemberToClassWithCredit(memberId: number, sessionId: number): Promise<any> {
+    console.log('🎯 Debug: addMemberToClassWithCredit called');
+    console.log('  - Member ID:', memberId);
+    console.log('  - Session ID:', sessionId);
+    
     const url = 'https://api.momence.com/host/33905/pos/payments/pay-cart';
+    console.log('  - Request URL:', url);
+    
     const payload = {
       hostId: 33905,
       payingMemberId: memberId,
@@ -567,19 +593,35 @@ class MomenceAPI {
       isEmailSent: false,
       homeLocationId: 22116
     };
+    
+    console.log('  - Payload:', JSON.stringify(payload, null, 2));
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: this.getMomenceHeaders(),
-      body: JSON.stringify(payload)
-    });
+    try {
+      console.log('🚀 Making request to Momence API...');
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: this.getMomenceHeaders(),
+        body: JSON.stringify(payload)
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to add member to class with credit: ${response.status} ${errorText}`);
+      console.log('📨 Response received:');
+      console.log('  - Status:', response.status);
+      console.log('  - Status Text:', response.statusText);
+      console.log('  - Headers:', Object.fromEntries(response.headers.entries()));
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Error response body:', errorText);
+        throw new Error(`Failed to add member to class with credit: ${response.status} ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Success response:', result);
+      return result;
+    } catch (error) {
+      console.error('💥 Request failed:', error);
+      throw error;
     }
-
-    return response.json();
   }
 }
 
