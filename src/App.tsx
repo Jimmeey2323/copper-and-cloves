@@ -400,7 +400,7 @@ function App() {
             </div>
           )}
 
-          {/* Debug Panel (Development Only) */}
+
           {process.env.NODE_ENV === 'development' && sessions.length > 0 && (
             <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
               <h3 className="font-semibold text-yellow-800 mb-2">🔧 Session Status Debug</h3>

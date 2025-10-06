@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from '@/components/loading-spinner';
 import { AnimatedBadge } from '@/components/animated-badge';
 import { NewMemberForm } from '@/components/new-member-form';
-import { Search, UserPlus, Phone, Mail, EyeOff, User } from 'lucide-react';
+import { Search, UserPlus, Mail, EyeOff, User } from 'lucide-react';
 
 interface MemberSearchProps {
   sessionId?: number;
@@ -54,16 +54,10 @@ export function MemberSearch({ sessionId, onMemberAdded }: MemberSearchProps) {
     }
 
     try {
-      try {
-        if (useCredit) {
-          await memberAPI.addMemberToClassWithCredit(member.id, sessionId);
-        } else {
-          await memberAPI.addMemberToClass(member.id, sessionId);
-        }
-      } catch (apiError) {
-        console.warn('API call failed, simulating success:', apiError);
-        // Simulate successful addition for demo
-        await new Promise(resolve => setTimeout(resolve, 500));
+      if (useCredit) {
+        await memberAPI.addMemberToClassWithCredit(member.id, sessionId);
+      } else {
+        await memberAPI.addMemberToClass(member.id, sessionId);
       }
       
       setShowResults(false);

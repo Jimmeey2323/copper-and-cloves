@@ -174,32 +174,29 @@ class MomenceAPI {
   private getMomenceHeaders() {
     const cookieValue = import.meta.env.VITE_MOMENCE_ALL_COOKIES;
     
-    // Debug logging
-    console.log('🍪 Debug: Cookie environment variable status:');
-    console.log('  - Variable name: VITE_MOMENCE_ALL_COOKIES');
-    console.log('  - Value exists:', !!cookieValue);
-    console.log('  - Value length:', cookieValue?.length || 0);
-    console.log('  - First 50 chars:', cookieValue?.substring(0, 50) || 'No value');
-    
-    if (!cookieValue) {
-      console.warn('⚠️ Warning: VITE_MOMENCE_ALL_COOKIES is not set in environment variables!');
-    }
-    
-    const headers = {
-      'Cookie': cookieValue,
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'User-Agent': 'Mozilla/5.0 (compatible; LeadsScript/1.0)',
-      'Connection': 'keep-alive',
-      'Cache-Control': 'no-cache'
+    return {
+      'accept': 'application/json, text/plain, */*',
+      'accept-language': 'en-US,en;q=0.9',
+      'cache-control': 'no-cache',
+      'content-type': 'application/json',
+      'cookie': cookieValue,
+      'dnt': '1',
+      'origin': 'https://momence.com',
+      'pragma': 'no-cache',
+      'priority': 'u=1, i',
+      'referer': 'https://momence.com/',
+      'sec-ch-ua': '"Chromium";v="140", "Not=A?Brand";v="24", "Google Chrome";v="140"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"macOS"',
+      'sec-fetch-dest': 'empty',
+      'sec-fetch-mode': 'cors',
+      'sec-fetch-site': 'same-site',
+      'sec-gpc': '1',
+      'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+      'x-app': 'dashboard-be30c5883a626f6fa3c6b7ccefdf1fe89608a668',
+      'x-idempotence-key': crypto.randomUUID(),
+      'x-origin': 'https://momence.com/dashboard/33905/sessions'
     };
-    
-    console.log('🔍 Debug: Constructed headers:', {
-      ...headers,
-      Cookie: headers.Cookie ? `${headers.Cookie.substring(0, 50)}...` : 'NOT SET'
-    });
-    
-    return headers;
   }
 
   async authenticate(): Promise<AuthResponse> {
@@ -563,19 +560,14 @@ class MomenceAPI {
   }
 
   async addMemberToClassWithCredit(memberId: number, sessionId: number): Promise<any> {
-    console.log('🎯 Debug: addMemberToClassWithCredit called');
-    console.log('  - Member ID:', memberId);
-    console.log('  - Session ID:', sessionId);
-    
     const url = 'https://api.momence.com/host/33905/pos/payments/pay-cart';
-    console.log('  - Request URL:', url);
     
     const payload = {
       hostId: 33905,
       payingMemberId: memberId,
       targetMemberId: memberId,
       items: [{
-        guid: "b96ccae3-cff4-48c4-9f76-9bcd5ac029bf",
+        guid: crypto.randomUUID(),
         type: "session",
         quantity: 1,
         priceInCurrency: 900,
@@ -588,40 +580,24 @@ class MomenceAPI {
         type: "custom",
         transactionTagId: 5802,
         weightRelative: 1,
-        guid: "32b376dd-ae69-4519-95df-335555740e91"
+        guid: crypto.randomUUID()
       }],
       isEmailSent: false,
       homeLocationId: 22116
     };
-    
-    console.log('  - Payload:', JSON.stringify(payload, null, 2));
 
-    try {
-      console.log('🚀 Making request to Momence API...');
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: this.getMomenceHeaders(),
-        body: JSON.stringify(payload)
-      });
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: this.getMomenceHeaders(),
+      body: JSON.stringify(payload)
+    });
 
-      console.log('📨 Response received:');
-      console.log('  - Status:', response.status);
-      console.log('  - Status Text:', response.statusText);
-      console.log('  - Headers:', Object.fromEntries(response.headers.entries()));
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ Error response body:', errorText);
-        throw new Error(`Failed to add member to class with credit: ${response.status} ${errorText}`);
-      }
-
-      const result = await response.json();
-      console.log('✅ Success response:', result);
-      return result;
-    } catch (error) {
-      console.error('💥 Request failed:', error);
-      throw error;
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to add member to class with credit: ${response.status} ${errorText}`);
     }
+
+    return response.json();
   }
 }
 

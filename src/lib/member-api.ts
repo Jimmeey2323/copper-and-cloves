@@ -178,49 +178,8 @@ export const memberAPI = {
   },
   
   async addMemberToClassWithCredit(memberId: number, sessionId: number): Promise<AddMemberToClassResponse> {
-    const response = await momenceAPI.request(
-      `https://api.momence.com/host/33905/pos/payments/pay-cart`,
-      {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify({
-          hostId: 33905,
-          payingMemberId: memberId,
-          targetMemberId: memberId,
-          items: [
-            {
-              guid: "b96ccae3-cff4-48c4-9f76-9bcd5ac029bf",
-              type: "session",
-              quantity: 1,
-              priceInCurrency: 900,
-              sessionId: sessionId,
-              isPaymentPlanUsed: false,
-              appliedPriceRuleIds: [],
-              isOverrideCapacity: false
-            }
-          ],
-          paymentMethods: [
-            {
-              type: "custom",
-              transactionTagId: 5802,
-              weightRelative: 1,
-              guid: "32b376dd-ae69-4519-95df-335555740e91"
-            }
-          ],
-          isEmailSent: false,
-          homeLocationId: 22116
-        })
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to add member to class with credit: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return redactData(data);
+    const result = await momenceAPI.addMemberToClassWithCredit(memberId, sessionId);
+    return result;
   },
 
   async createNewMember(memberDetails: {

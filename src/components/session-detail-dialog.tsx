@@ -15,7 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/loading-spinner';
 import { MemberSearch } from '@/components/member-search';
-import { Users, Clock, MapPin, Calendar, Phone, Mail, UserCheck, Eye, EyeOff } from 'lucide-react';
+import { Users, Clock, MapPin, Calendar, Mail, UserCheck, Eye, EyeOff } from 'lucide-react';
 
 interface SessionDetailDialogProps {
   session: SessionDetail | null;
@@ -441,7 +441,7 @@ export function SessionDetailDialog({
                 sessionId={session.id} 
                 onMemberAdded={() => {
                   // Optionally refresh the session data here
-                  console.log('Member added to session');
+
                 }} 
               />
             </div>
