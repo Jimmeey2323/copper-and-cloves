@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { format, parseISO } from 'date-fns';
 import { type Session } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,7 +12,7 @@ interface SessionsTableProps {
   onSessionClick: (sessionId: number) => void;
 }
 
-export function SessionsTable({ sessions, onSessionClick }: SessionsTableProps) {
+export const SessionsTable = React.memo(function SessionsTable({ sessions, onSessionClick }: SessionsTableProps) {
   const [sortBy, setSortBy] = useState<'startsAt' | 'name' | 'bookingCount'>('startsAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [filter, setFilter] = useState<'all' | 'fitness' | 'private'>('all');
@@ -455,4 +455,4 @@ export function SessionsTable({ sessions, onSessionClick }: SessionsTableProps) 
       )}
     </div>
   );
-}
+});

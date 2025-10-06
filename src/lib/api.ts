@@ -170,18 +170,7 @@ class MomenceAPI {
     password: 'Jimmeey@123'
   };
 
-  // Helper function for Momence cookie-based headers (used for credit operations)
-  private getMomenceHeaders() {
-    const cookieValue = import.meta.env.VITE_MOMENCE_ALL_COOKIES;
-    
-    return {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Cookie': cookieValue,
-      'X-App': 'dashboard-be30c5883a626f6fa3c6b7ccefdf1fe89608a668',
-      'X-Idempotence-Key': crypto.randomUUID()
-    };
-  }
+
 
   async authenticate(): Promise<AuthResponse> {
     try {
@@ -544,7 +533,8 @@ class MomenceAPI {
   }
 
   async addMemberToClassWithCredit(memberId: number, sessionId: number): Promise<any> {
-    const url = 'https://api.momence.com/host/33905/pos/payments/pay-cart';
+    // Use the Vite proxy to avoid CORS and cookie issues
+    const url = '/api/momence/host/33905/pos/payments/pay-cart';
     
     const payload = {
       hostId: 33905,
@@ -572,7 +562,10 @@ class MomenceAPI {
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: this.getMomenceHeaders(),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(payload)
     });
 

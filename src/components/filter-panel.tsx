@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { type Session } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ export interface SessionFilters {
   capacity?: 'available' | 'full' | 'waitlist' | 'all';
 }
 
-export function FilterPanel({ sessions, onFilterChange, currentFilters }: FilterPanelProps) {
+export const FilterPanel = React.memo(function FilterPanel({ sessions, onFilterChange, currentFilters }: FilterPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Extract unique values for filter options
@@ -217,4 +217,4 @@ export function FilterPanel({ sessions, onFilterChange, currentFilters }: Filter
       )}
     </Card>
   );
-}
+});

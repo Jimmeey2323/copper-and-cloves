@@ -26,17 +26,19 @@ interface SessionDetailDialogProps {
   onCheckIn: (bookingId: number) => Promise<void>;
   onCheckOut: (bookingId: number) => Promise<void>;
   onCancelBooking: (bookingId: number, isLateCancellation?: boolean) => Promise<void>;
+  onMemberAdded?: () => Promise<void>;
 }
 
-export function SessionDetailDialog({
-  session,
-  bookings,
-  open,
-  onOpenChange,
-  loading,
-  onCheckIn,
-  onCheckOut,
-  onCancelBooking
+export function SessionDetailDialog({ 
+  session, 
+  bookings, 
+  open, 
+  onOpenChange, 
+  loading, 
+  onCheckIn, 
+  onCheckOut, 
+  onCancelBooking,
+  onMemberAdded 
 }: SessionDetailDialogProps) {
   const [cancelingBookingId, setCancelingBookingId] = useState<number | null>(null);
   const [decryptionKey, setDecryptionKey] = useState('');
@@ -439,10 +441,7 @@ export function SessionDetailDialog({
             <div className="mt-6">
               <MemberSearch 
                 sessionId={session.id} 
-                onMemberAdded={() => {
-                  // Optionally refresh the session data here
-
-                }} 
+                onMemberAdded={onMemberAdded} 
               />
             </div>
           </>

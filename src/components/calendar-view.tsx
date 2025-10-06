@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, parseISO, addWeeks, subWeeks } from 'date-fns';
 import { type Session } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,7 +12,7 @@ interface CalendarViewProps {
   onSessionClick: (sessionId: number) => void;
 }
 
-export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
+export const CalendarView = React.memo(function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
   const [currentWeek, setCurrentWeek] = useState(new Date());
 
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 }); // Start on Monday
@@ -198,4 +198,4 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
       </Card>
     </div>
   );
-}
+});
