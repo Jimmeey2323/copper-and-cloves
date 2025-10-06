@@ -529,6 +529,51 @@ class MomenceAPI {
 
     return response.json();
   }
+
+  async addMemberToClassWithCredit(memberId: number, sessionId: number): Promise<any> {
+    const url = 'https://api.momence.com/host/33905/pos/payments/pay-cart';
+    const payload = {
+      hostId: 33905,
+      payingMemberId: memberId,
+      targetMemberId: memberId,
+      items: [{
+        guid: "b96ccae3-cff4-48c4-9f76-9bcd5ac029bf",
+        type: "session",
+        quantity: 1,
+        priceInCurrency: 900,
+        sessionId: sessionId,
+        isPaymentPlanUsed: false,
+        appliedPriceRuleIds: [],
+        isOverrideCapacity: false
+      }],
+      paymentMethods: [{
+        type: "custom",
+        transactionTagId: 5802,
+        weightRelative: 1,
+        guid: "32b376dd-ae69-4519-95df-335555740e91"
+      }],
+      isEmailSent: false,
+      homeLocationId: 22116
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Cookie': import.meta.env.VITE_MOMENCE_ALL_COOKIES,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (compatible; LeadsScript/1.0)',
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to add member to class with credit: ${response.status} ${errorText}`);
+    }
+
+    return response.json();
+  }
 }
 
 export const momenceAPI = new MomenceAPI();
