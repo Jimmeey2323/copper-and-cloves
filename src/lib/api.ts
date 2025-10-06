@@ -307,7 +307,7 @@ class MomenceAPI {
       sortBy: 'startsAt',
       includeCancelled: (params.includeCancelled || true).toString(),
       locationId: (params.locationId || 36372).toString(),
-      startAfter: params.startAfter || '10/01/2025',
+      startAfter: params.startAfter || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     });
 
     // Add types

@@ -39,16 +39,14 @@ function App() {
 
     // First apply tab filter (upcoming vs past)
     if (currentTab === 'upcoming') {
-      filtered = filtered.filter(session => 
+      filtered = filtered.filter(session =>
         !session.isCancelled && !isBefore(parseISO(session.endsAt), now)
       );
     } else if (currentTab === 'past') {
-      filtered = filtered.filter(session => 
+      filtered = filtered.filter(session =>
         isBefore(parseISO(session.endsAt), now) || session.isCancelled
       );
-    }
-
-    // Apply search filter
+    }    // Apply search filter
     if (filters.searchTerm) {
       const searchTerm = filters.searchTerm.toLowerCase();
       filtered = filtered.filter(session => 
