@@ -35,38 +35,6 @@
   }
 }
 
-@keyframes logo-glow {
-  0%, 100% {
-    filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.5));
-    transform: scale(1);
-  }
-  50% {
-    filter: drop-shadow(0 0 20px rgba(147, 51, 234, 0.8));
-    transform: scale(1.05);
-  }
-}
-
-@keyframes logo-float {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  25% {
-    transform: translateY(-3px) rotate(1deg);
-  }
-  75% {
-    transform: translateY(3px) rotate(-1deg);
-  }
-}
-
-@keyframes logo-spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .animate-spin-reverse {
   animation: spin-reverse 1s linear infinite;
 }
@@ -78,18 +46,6 @@
 .animate-gradient-shift {
   background-size: 200% 200%;
   animation: gradient-shift 3s ease-in-out infinite;
-}
-
-.animate-logo-glow {
-  animation: logo-glow 3s ease-in-out infinite;
-}
-
-.animate-logo-float {
-  animation: logo-float 4s ease-in-out infinite;
-}
-
-.animate-spin-slow {
-  animation: logo-spin-slow 8s linear infinite;
 }
 
 /* Slow pulse animation for subtle badge effects */
