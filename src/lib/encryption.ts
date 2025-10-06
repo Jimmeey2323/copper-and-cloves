@@ -47,11 +47,18 @@ export class DataEncryption {
     const [username, domain] = email.split('@');
     if (!domain) return '***@***.***';
     
-    const maskedUsername = username.length > 3 
+    // Show only first 2 characters of username
+    const maskedUsername = username.length > 2 
       ? username.substring(0, 2) + '•'.repeat(username.length - 2)
-      : '•'.repeat(username.length);
+      : username.substring(0, 1) + '•'.repeat(username.length - 1);
     
-    return `${maskedUsername}@${domain}`;
+    // Show only first 2 characters of domain
+    const [domainName, extension] = domain.split('.');
+    const maskedDomain = domainName.length > 2
+      ? domainName.substring(0, 2) + '•'.repeat(domainName.length - 2)
+      : domainName.substring(0, 1) + '•'.repeat(domainName.length - 1);
+    
+    return `${maskedUsername}@${maskedDomain}.${extension}`;
   }
   
   static maskPhone(phone: string): string {
@@ -59,6 +66,7 @@ export class DataEncryption {
     const cleaned = phone.replace(/\D/g, '');
     if (cleaned.length < 4) return '•'.repeat(cleaned.length);
     
-    return cleaned.substring(0, 3) + '•'.repeat(cleaned.length - 6) + cleaned.slice(-3);
+    // Show only first 2 digits
+    return cleaned.substring(0, 2) + '•'.repeat(cleaned.length - 2);
   }
 }

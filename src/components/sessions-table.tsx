@@ -289,7 +289,11 @@ export function SessionsTable({ sessions, onSessionClick }: SessionsTableProps) 
                       )}
                     </div>
                     {session.description && (
-                      <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">{session.description}</p>
+                      <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                        {session.description.length > 100 
+                          ? `${session.description.substring(0, 100)}...` 
+                          : session.description}
+                      </p>
                     )}
                     <div className="flex items-center space-x-2">
                       <AnimatedBadge status={session.type === 'fitness' ? 'upcoming' : 'available'}>
