@@ -77,9 +77,9 @@ export function SessionDetailDialog({
               <DialogTitle className="text-2xl font-bold">{session.name}</DialogTitle>
               <DialogDescription>
                 {session.description ? (
-                  <p className="mt-2 text-base text-gray-600 whitespace-pre-wrap max-h-[300px] overflow-y-auto">{session.description}</p>
+                  <div className="mt-2 text-base text-gray-600 whitespace-pre-wrap max-h-[300px] overflow-y-auto">{session.description}</div>
                 ) : (
-                  <p className="mt-2 text-base text-gray-600">Class details and member management</p>
+                  <div className="mt-2 text-base text-gray-600">Class details and member management</div>
                 )}
               </DialogDescription>
             </DialogHeader>
