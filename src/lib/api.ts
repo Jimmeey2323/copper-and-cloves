@@ -175,27 +175,11 @@ class MomenceAPI {
     const cookieValue = import.meta.env.VITE_MOMENCE_ALL_COOKIES;
     
     return {
-      'accept': 'application/json, text/plain, */*',
-      'accept-language': 'en-US,en;q=0.9',
-      'cache-control': 'no-cache',
-      'content-type': 'application/json',
-      'cookie': cookieValue,
-      'dnt': '1',
-      'origin': 'https://momence.com',
-      'pragma': 'no-cache',
-      'priority': 'u=1, i',
-      'referer': 'https://momence.com/',
-      'sec-ch-ua': '"Chromium";v="140", "Not=A?Brand";v="24", "Google Chrome";v="140"',
-      'sec-ch-ua-mobile': '?0',
-      'sec-ch-ua-platform': '"macOS"',
-      'sec-fetch-dest': 'empty',
-      'sec-fetch-mode': 'cors',
-      'sec-fetch-site': 'same-site',
-      'sec-gpc': '1',
-      'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
-      'x-app': 'dashboard-be30c5883a626f6fa3c6b7ccefdf1fe89608a668',
-      'x-idempotence-key': crypto.randomUUID(),
-      'x-origin': 'https://momence.com/dashboard/33905/sessions'
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Cookie': cookieValue,
+      'X-App': 'dashboard-be30c5883a626f6fa3c6b7ccefdf1fe89608a668',
+      'X-Idempotence-Key': crypto.randomUUID()
     };
   }
 
