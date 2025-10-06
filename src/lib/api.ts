@@ -284,6 +284,18 @@ class MomenceAPI {
       });
     }
 
+    // Check if response is valid before returning
+    if (!response.ok) {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const errorData = await response.json();
+        throw new Error(`API error: ${response.status} - ${JSON.stringify(errorData)}`);
+      } else {
+        const text = await response.text();
+        throw new Error(`API error: ${response.status} - ${text.substring(0, 200)}`);
+      }
+    }
+
     return response;
   }
 
@@ -318,11 +330,19 @@ class MomenceAPI {
       `${this.baseURL}/host/sessions?${queryParams}`
     );
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch sessions: ${response.status}`);
+    try {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return await response.json();
+      } else {
+        const text = await response.text();
+        console.error('Received non-JSON response:', text.substring(0, 200));
+        throw new Error(`Expected JSON but got ${contentType || 'unknown content type'}`);
+      }
+    } catch (error) {
+      console.error('Error parsing JSON response:', error);
+      throw new Error(`Failed to parse sessions response: ${error.message}`);
     }
-
-    return response.json();
   }
 
   async getSessionDetail(sessionId: number): Promise<SessionDetail> {
@@ -330,11 +350,19 @@ class MomenceAPI {
       `${this.baseURL}/host/sessions/${sessionId}`
     );
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch session detail: ${response.status}`);
+    try {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return await response.json();
+      } else {
+        const text = await response.text();
+        console.error('Received non-JSON response:', text.substring(0, 200));
+        throw new Error(`Expected JSON but got ${contentType || 'unknown content type'}`);
+      }
+    } catch (error) {
+      console.error('Error parsing JSON response:', error);
+      throw new Error(`Failed to parse session detail response: ${error.message}`);
     }
-
-    return response.json();
   }
 
   async getSessionBookings(sessionId: number, params: {
@@ -350,11 +378,19 @@ class MomenceAPI {
       `${this.baseURL}/host/sessions/${sessionId}/bookings?${queryParams}`
     );
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch session bookings: ${response.status}`);
+    try {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return await response.json();
+      } else {
+        const text = await response.text();
+        console.error('Received non-JSON response:', text.substring(0, 200));
+        throw new Error(`Expected JSON but got ${contentType || 'unknown content type'}`);
+      }
+    } catch (error) {
+      console.error('Error parsing JSON response:', error);
+      throw new Error(`Failed to parse session bookings response: ${error.message}`);
     }
-
-    return response.json();
   }
 
   async checkInBooking(bookingId: number): Promise<void> {
@@ -425,11 +461,19 @@ class MomenceAPI {
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`Failed to create member: ${response.status}`);
+    try {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return await response.json();
+      } else {
+        const text = await response.text();
+        console.error('Received non-JSON response:', text.substring(0, 200));
+        throw new Error(`Expected JSON but got ${contentType || 'unknown content type'}`);
+      }
+    } catch (error) {
+      console.error('Error parsing JSON response:', error);
+      throw new Error(`Failed to create member: ${error.message}`);
     }
-
-    return response.json();
   }
 
   async getMemberSessions(
@@ -459,11 +503,19 @@ class MomenceAPI {
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch member sessions: ${response.status}`);
+    try {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return await response.json();
+      } else {
+        const text = await response.text();
+        console.error('Received non-JSON response:', text.substring(0, 200));
+        throw new Error(`Expected JSON but got ${contentType || 'unknown content type'}`);
+      }
+    } catch (error) {
+      console.error('Error parsing JSON response:', error);
+      throw new Error(`Failed to fetch member sessions: ${error.message}`);
     }
-
-    return response.json();
   }
 
   async getMemberById(memberId: number): Promise<Member> {
