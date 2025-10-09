@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { parseISO, isAfter, isBefore } from 'date-fns';
+import { parseISO, isAfter, isBefore, startOfDay, endOfDay, startOfWeek, endOfWeek, addWeeks, startOfMonth, endOfMonth, isSameDay, isWithinInterval } from 'date-fns';
 import { momenceAPI, type Session, type SessionDetail, type Booking } from '@/lib/api';
 import { SessionsTable } from '@/components/sessions-table';
 import { CalendarView } from '@/components/calendar-view';
@@ -15,7 +15,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { List, Calendar, Grid3X3, LayoutGrid, BarChart3 } from 'lucide-react';
 
 type ViewType = 'table' | 'calendar' | 'monthly' | 'kanban' | 'reports';
-type SessionsTab = 'upcoming' | 'past';
+type SessionsTab = 'today' | 'this-week' | 'last-week' | 'next-week' | 'this-month' | 'all-time';
 
 function App() {
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -26,7 +26,7 @@ function App() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loadingSessionDetail, setLoadingSessionDetail] = useState(false);
   const [currentView, setCurrentView] = useState<ViewType>('table');
-  const [currentTab, setCurrentTab] = useState<SessionsTab>('upcoming');
+  const [currentTab, setCurrentTab] = useState<SessionsTab>('today');
   const [filters, setFilters] = useState<SessionFilters>({});
 
   useEffect(() => {
@@ -40,18 +40,39 @@ function App() {
 
 
 
-    // First apply tab filter (upcoming vs past)
-    if (currentTab === 'upcoming') {
+    // Apply time-based tab filter
+    if (currentTab !== 'all-time') {
       filtered = filtered.filter(session => {
-        const endTime = parseISO(session.endsAt);
-        // Include sessions that haven't ended yet (both upcoming and in-progress)
-        return !session.isCancelled && now <= endTime;
-      });
-    } else if (currentTab === 'past') {
-      filtered = filtered.filter(session => {
-        const endTime = parseISO(session.endsAt);
-        // Include sessions that have ended or are cancelled
-        return now > endTime || session.isCancelled;
+        const sessionStart = parseISO(session.startsAt);
+        const sessionEnd = parseISO(session.endsAt);
+        
+        switch (currentTab) {
+          case 'today':
+            return isSameDay(sessionStart, now) || isWithinInterval(now, { start: sessionStart, end: sessionEnd });
+          
+          case 'this-week':
+            const thisWeekStart = startOfWeek(now, { weekStartsOn: 1 }); // Monday
+            const thisWeekEnd = endOfWeek(now, { weekStartsOn: 1 });
+            return isWithinInterval(sessionStart, { start: thisWeekStart, end: thisWeekEnd });
+          
+          case 'last-week':
+            const lastWeekStart = startOfWeek(addWeeks(now, -1), { weekStartsOn: 1 });
+            const lastWeekEnd = endOfWeek(addWeeks(now, -1), { weekStartsOn: 1 });
+            return isWithinInterval(sessionStart, { start: lastWeekStart, end: lastWeekEnd });
+          
+          case 'next-week':
+            const nextWeekStart = startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 });
+            const nextWeekEnd = endOfWeek(addWeeks(now, 1), { weekStartsOn: 1 });
+            return isWithinInterval(sessionStart, { start: nextWeekStart, end: nextWeekEnd });
+          
+          case 'this-month':
+            const thisMonthStart = startOfMonth(now);
+            const thisMonthEnd = endOfMonth(now);
+            return isWithinInterval(sessionStart, { start: thisMonthStart, end: thisMonthEnd });
+          
+          default:
+            return true;
+        }
       });
     }
     
@@ -348,41 +369,66 @@ function App() {
             </Card>
           </div>
 
-          {/* Tab Selector - Show only for non-reports views */}
+          {/* Time-based Tab Selector - Show only for non-reports views */}
           {currentView !== 'reports' && (
             <div className="flex justify-center mb-6">
-              <div className="flex space-x-2 p-1 bg-gray-100 rounded-lg">
-                <Button
-                  variant={currentTab === 'upcoming' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setCurrentTab('upcoming')}
-                  className={currentTab === 'upcoming' 
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 shadow-lg' 
-                    : 'hover:bg-green-50 text-gray-700'
-                  }
-                >
-                  Upcoming & Live ({(() => {
+              <div className="flex flex-wrap gap-2 p-1 bg-gray-100 rounded-lg max-w-4xl">
+                {[
+                  { key: 'today', label: 'Today', color: 'from-blue-500 to-blue-600' },
+                  { key: 'this-week', label: 'This Week', color: 'from-green-500 to-green-600' },
+                  { key: 'last-week', label: 'Last Week', color: 'from-purple-500 to-purple-600' },
+                  { key: 'next-week', label: 'Next Week', color: 'from-orange-500 to-orange-600' },
+                  { key: 'this-month', label: 'This Month', color: 'from-pink-500 to-pink-600' },
+                  { key: 'all-time', label: 'All Time', color: 'from-gray-500 to-gray-600' }
+                ].map(tab => {
+                  const count = (() => {
                     const now = new Date();
-                    const upcomingCount = sessions.filter(s => !s.isCancelled && now <= parseISO(s.endsAt)).length;
-                    const liveCount = sessions.filter(s => {
-                      const startTime = parseISO(s.startsAt);
-                      const endTime = parseISO(s.endsAt);
-                      return !s.isCancelled && now >= startTime && now <= endTime;
+                    return sessions.filter(session => {
+                      const sessionStart = parseISO(session.startsAt);
+                      const sessionEnd = parseISO(session.endsAt);
+                      
+                      switch (tab.key as SessionsTab) {
+                        case 'today':
+                          return isSameDay(sessionStart, now) || isWithinInterval(now, { start: sessionStart, end: sessionEnd });
+                        case 'this-week':
+                          const thisWeekStart = startOfWeek(now, { weekStartsOn: 1 });
+                          const thisWeekEnd = endOfWeek(now, { weekStartsOn: 1 });
+                          return isWithinInterval(sessionStart, { start: thisWeekStart, end: thisWeekEnd });
+                        case 'last-week':
+                          const lastWeekStart = startOfWeek(addWeeks(now, -1), { weekStartsOn: 1 });
+                          const lastWeekEnd = endOfWeek(addWeeks(now, -1), { weekStartsOn: 1 });
+                          return isWithinInterval(sessionStart, { start: lastWeekStart, end: lastWeekEnd });
+                        case 'next-week':
+                          const nextWeekStart = startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 });
+                          const nextWeekEnd = endOfWeek(addWeeks(now, 1), { weekStartsOn: 1 });
+                          return isWithinInterval(sessionStart, { start: nextWeekStart, end: nextWeekEnd });
+                        case 'this-month':
+                          const thisMonthStart = startOfMonth(now);
+                          const thisMonthEnd = endOfMonth(now);
+                          return isWithinInterval(sessionStart, { start: thisMonthStart, end: thisMonthEnd });
+                        case 'all-time':
+                          return true;
+                        default:
+                          return false;
+                      }
                     }).length;
-                    return liveCount > 0 ? `${upcomingCount} • ${liveCount} LIVE` : upcomingCount;
-                  })()})
-                </Button>
-                <Button
-                  variant={currentTab === 'past' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setCurrentTab('past')}
-                  className={currentTab === 'past' 
-                    ? 'bg-gradient-to-r from-gray-500 to-slate-600 text-white hover:from-gray-600 hover:to-slate-700 shadow-lg' 
-                    : 'hover:bg-gray-50 text-gray-700'
-                  }
-                >
-                  Past Classes ({sessions.filter(s => new Date() > parseISO(s.endsAt) || s.isCancelled).length})
-                </Button>
+                  })();
+                  
+                  return (
+                    <Button
+                      key={tab.key}
+                      variant={currentTab === tab.key ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setCurrentTab(tab.key as SessionsTab)}
+                      className={currentTab === tab.key 
+                        ? `bg-gradient-to-r ${tab.color} text-white hover:opacity-90 shadow-lg` 
+                        : 'hover:bg-gray-50 text-gray-700'
+                      }
+                    >
+                      {tab.label} ({count})
+                    </Button>
+                  );
+                })}
               </div>
             </div>
           )}

@@ -84,11 +84,9 @@ const redactData = (data: any): any => {
 export const memberAPI = {
   async searchMembers(searchTerm: string): Promise<MemberSearchResponse> {
     try {
-      console.log('Searching for members with term:', searchTerm);
       
       // Use the correct API format - query parameter expects name/email search term
       const url = `https://api.momence.com/api/v2/host/members?page=0&pageSize=100&sortOrder=DESC&sortBy=firstSeenAt&query=${encodeURIComponent(searchTerm)}`;
-      console.log('Member search URL:', url);
       
       const response = await momenceAPI.request(url, {
         method: 'GET',
@@ -97,16 +95,13 @@ export const memberAPI = {
         }
       });
 
-      console.log('Member search response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Member search error response:', errorText);
         throw new Error(`Search failed: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log('Member search success, found members:', data.payload?.length || 0);
       
       return {
         ...data,
@@ -130,7 +125,6 @@ export const memberAPI = {
 
   async getMemberById(memberId: number): Promise<Member> {
     try {
-      console.log('Getting member details for ID:', memberId);
       
       const response = await momenceAPI.request(
         `https://api.momence.com/api/v2/host/members/${memberId}`,

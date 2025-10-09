@@ -560,7 +560,8 @@ class MomenceAPI {
       homeLocationId: 22116
     };
 
-    const response = await fetch(url, {
+    // Use the authenticated request method to ensure proper authentication
+    const response = await this.makeAuthenticatedRequest(url, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
